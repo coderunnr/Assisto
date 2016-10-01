@@ -1,5 +1,6 @@
 package com.kani.project.assisto;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,12 +13,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.kani.project.assisto.adapter.MyAdapterMainChat;
 import com.kani.project.assisto.connectionutils.Connection;
 import com.kani.project.assisto.connectionutils.models.ChatModel;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -78,16 +81,20 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         String userMessage=editText.getText().toString();
-        userMessage=userMessage.replace(" ","+");
-
-        String url="http://10.0.151.148:8080/?method=POST&name="+userMessage;
-        SendMessage sendMessage=new SendMessage(url,new JSONObject());
-        sendMessage.execute();
+        editText.setText("");
         ChatModel chatModel=new ChatModel();
         chatModel.setMessage(userMessage);
         chatModel.setResponse(false);
+        userMessage=userMessage.replace(" ","+");
         list.add(chatModel);
+        String url="http://10.0.151.148:8080/?method=POST&name="+userMessage;
+        SendMessage sendMessage=new SendMessage(url,new JSONObject());
+        sendMessage.execute();
+
+
         addMessage();
 
 
@@ -121,6 +128,19 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
         @Override
         protected void onPostExecute(String s) {
             Log.v(getClass().getSimpleName(),s);
+            try {
+                JSONObject main=new JSONObject(s);
+                String message=main.getString("response");
+                if(!message.equals("")) {
+                    ChatModel chatModel = new ChatModel();
+                    chatModel.setMessage(message);
+                    chatModel.setResponse(true);
+                    list.add(chatModel);
+                    addMessage();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
