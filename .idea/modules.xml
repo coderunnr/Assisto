@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Assisto.iml" filepath="$PROJECT_DIR$/Assisto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PGSDK_v1.0/PGSDK_v1.0.iml" filepath="$PROJECT_DIR$/PGSDK_v1.0/PGSDK_v1.0.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

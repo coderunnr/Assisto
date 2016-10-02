@@ -1,6 +1,7 @@
 package com.kani.project.assisto;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -52,6 +53,8 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
         recyclerView.setAdapter(adapter);
         editText=(EditText)findViewById(R.id.edit_chat);
         findViewById(R.id.button_send).setOnClickListener(this);
+       // Intent intent=new Intent(MainChat.this,DoctorsPlace.class);
+       // startActivity(intent);
 
 
 
@@ -88,14 +91,21 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
         ChatModel chatModel=new ChatModel();
         chatModel.setMessage(userMessage);
         chatModel.setResponse(false);
-        userMessage=userMessage.replace(" ","+");
         list.add(chatModel);
-        String url="http://10.0.151.148:8080/?method=POST&name="+userMessage;
-        SendMessage sendMessage=new SendMessage(url,new JSONObject());
-        sendMessage.execute();
+        if(userMessage.equals("consult_doctor"))
+        {
+            Intent intent=new Intent(MainChat.this,DoctorsPlace.class);
+            startActivity(intent);
+        }
+        else {
+            userMessage = userMessage.replace(" ", "+");
+            String url = "http://10.0.151.148:8080/?method=POST&name=" + userMessage;
+            SendMessage sendMessage = new SendMessage(url, new JSONObject());
+            sendMessage.execute();
 
 
-        addMessage();
+            addMessage();
+        }
 
 
 
@@ -105,6 +115,7 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
     public void addMessage()
     {
         adapter=new MyAdapterMainChat(list,MainChat.this);
+        recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(list.size()-1);
     }
 
