@@ -2,6 +2,7 @@ package com.kani.project.assisto;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -34,6 +35,7 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
     RecyclerView.Adapter adapter;
     EditText editText;
     List<ChatModel> list;
+    String movie="pink";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,12 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
             Intent intent=new Intent(MainChat.this,DoctorsPlace.class);
             startActivity(intent);
         }
+        else if (userMessage.equals("movie_book"))
+        {
+            //book movie
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.paytm.com/movies"));
+            startActivity(browserIntent);
+        }
         else {
             userMessage = userMessage.replace(" ", "+");
             String url = "http://10.0.151.148:8080/?method=POST&name=" + userMessage;
@@ -105,6 +113,12 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
 
 
             addMessage();
+            if(userMessage.contains("consult_doctor"))
+            {
+                editText.setText("consult_doctor");
+            }
+
+
         }
 
 

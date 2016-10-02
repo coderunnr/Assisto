@@ -36,6 +36,12 @@ public class MerchantActivity extends Activity {
         setContentView(R.layout.paid);
         initOrderId();
         view=findViewById(R.id.order_complete);
+        findViewById(R.id.paid_continue).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
@@ -79,6 +85,7 @@ public class MerchantActivity extends Activity {
                 "https://pguat.paytm.com/paytmchecksum/paytmCheckSumVerify.jsp");
 
         Service.initialize(Order, Merchant, null);
+
 
         Service.startPaymentTransaction(this, true, true,
                 new PaytmPaymentTransactionCallback() {
