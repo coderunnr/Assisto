@@ -5,18 +5,23 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.kani.project.assisto.adapter.MyAdapterMainChat;
 import com.kani.project.assisto.connectionutils.Connection;
@@ -30,11 +35,14 @@ import java.util.List;
 
 public class MainChat extends AppCompatActivity implements View.OnClickListener{
 
+    ImageView send;
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     RecyclerView.Adapter adapter;
     EditText editText;
     List<ChatModel> list;
+    MainChat mainChat;
+    int REQUEST_CODE=1234;
     String movie="pink";
 
     @Override
@@ -54,12 +62,75 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         editText=(EditText)findViewById(R.id.edit_chat);
-        findViewById(R.id.button_send).setOnClickListener(this);
+        send=(ImageView)findViewById(R.id.button_send);
+        mainChat=this;
+        send.setImageResource(R.drawable.microphone);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length()==0)
+                {
+                    send.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                            startActivityForResult(intent, REQUEST_CODE);
+                        }
+                    });
+                    send.setImageResource(R.drawable.microphone);
+
+                }
+                else
+                {
+                    findViewById(R.id.button_send).setOnClickListener(mainChat);
+                    send.setImageResource(R.drawable.forward_arrow);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
        // Intent intent=new Intent(MainChat.this,DoctorsPlace.class);
        // startActivity(intent);
 
 
 
+    }
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+
+
+           ArrayList<String> matches_text = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            editText.setText(matches_text.get(0));
+
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -83,6 +154,10 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
+
 
     @Override
     public void onClick(View view) {
@@ -113,10 +188,7 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
 
 
             addMessage();
-            if(userMessage.contains("consult_doctor"))
-            {
-                editText.setText("consult_doctor");
-            }
+
 
 
         }
@@ -162,6 +234,14 @@ public class MainChat extends AppCompatActivity implements View.OnClickListener{
                     chatModel.setResponse(true);
                     list.add(chatModel);
                     addMessage();
+                    if(message.contains("consult_doctor"))
+                    {
+                        editText.setText("consult_doctor");
+                    }
+                    else if (message.contains("movie_book"))
+                    {
+                        editText.setText("movie_book");
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
